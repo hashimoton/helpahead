@@ -53,28 +53,15 @@ class HelpAhead
   def parse_line(line)
     defs = {}
     
-    line.strip!
-    
     if line =~ /,\s+([0-9]\.[0-9]\.[0-9])/
       defs[:version] = $~[1]
     end
     
-    fields = line.split(/\s+/)
-    fields.each do |field|
-      if field.start_with?('-')
-        option_count = 0
-        field.split(',').each do |option|
-          option_count += 1
-          if option.start_with?("--")
-            defs[:long] = option
-          else
-            defs[:short] = option
-          end
-        end
-        
-        defs[:desc] = fields.drop(option_count).join(' ')
-      end
-    end
+    line =~ /\s*(-\w[\w=\[\]]*)?,?\s*(--\w[\w\-=\[\]]+)?\s*(.*)/
+    
+    defs[:short] = $~[1] if $~[1]
+    defs[:long] = $~[2] if $~[2]
+    defs[:desc] = $~[3] if $~[3]
     
     return defs
   end
